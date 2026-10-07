@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, Check, LogOut, ShieldCheck, UserRound } from 'lucide-react';
+import { AlertTriangle, Check, Info, LogOut, ShieldCheck, UserRound } from 'lucide-react';
 import { useStore } from '../store';
 import { Chip } from './ui';
 
@@ -204,6 +204,16 @@ export function AccountPanel({ onClose }: { onClose: () => void }) {
           <button className="btn btn-sm btn-ghost ml-auto" onClick={onClose}>
             关闭
           </button>
+        </div>
+
+        <div
+          className="muted mt-3 flex items-center justify-center gap-1.5 border-t pt-3 text-[11px]"
+          style={{ borderColor: 'var(--border)' }}
+        >
+          <Info size={12} />
+          <span>
+            Web ReNamer <span className="mono">v{__APP_VERSION__}</span>
+          </span>
         </div>
       </div>
     </div>

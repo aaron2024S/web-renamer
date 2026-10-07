@@ -1,6 +1,6 @@
 {
   "name": "web-renamer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "自托管 Docker 版文件批量重命名工具（ReNamer 替代）",
   "type": "module",
