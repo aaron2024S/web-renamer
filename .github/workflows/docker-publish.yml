@@ -43,7 +43,9 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v7
 
+      # 只在需要推送时才校验密钥；勾掉 push 可以纯粹验证镜像能否构建
       - name: 校验 Docker Hub 密钥
+        if: ${{ inputs.push }}
         env:
           DH_USER: ${{ secrets.DOCKERHUB_USERNAME }}
           DH_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
