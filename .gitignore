@@ -1,0 +1,22 @@
+node_modules/
+dist/
+build/
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# 运行时数据（预设 / 历史 / 配置），不要提交
+data/
+renamer-config/
+config/
+*.sqlite
+*.sqlite-journal
+.tmp/
+
+# 本地环境变量
+.env
+.env.local
+
+# 本地冒烟测试用的示例目录
+.tmp-smoke/

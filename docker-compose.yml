@@ -1,0 +1,53 @@
+services:
+  renamer:
+    build: .
+    image: renamer-web:latest
+    container_name: renamer-web
+    ports:
+      # 左边是宿主机端口，右边是容器内端口（与 PORT 保持一致）
+      - "7582:7582"
+    environment:
+      CONFIG_DIR: /config
+      # 容器内监听端口，改这里要同步改上面的映射（右侧）
+      PORT: 7582
+      # NAS 上按宿主文件属主来设置，保证有权限读写
+      PUID: 1000
+      PGID: 1000
+      TZ: Asia/Shanghai
+
+      # 首次登录：admin / admin123，登录后请在右上角「账号」里改掉
+      # 也可以在创建容器前先改这里（仅首次生效，之后以数据库里存的口令为准）
+      # AUTH_USER: admin
+      # AUTH_PASSWORD: 换成你自己的密码
+
+      # ── 多根目录（可选） ──
+      # 需要顶栏出现多个「根目录」入口时才开启，写容器内路径，逗号分隔。
+      # 每个路径都必须在上面的 volumes 里挂载；不写则默认只有一个根目录 /data。
+      # ROOTS: /data/photos,/data/downloads,/data/music
+
+      # ── 登录防爆破（不填就用默认值） ──
+      # LOGIN_MAX_ATTEMPTS: 5        # 窗口内失败几次就锁定
+      # LOGIN_WINDOW_MS: 600000      # 失败计数窗口（10 分钟）
+      # LOGIN_LOCK_MS: 900000        # 首次锁定时长（15 分钟），连续锁定翻倍
+      # LOGIN_LOCK_MAX_MS: 3600000   # 锁定上限（1 小时）
+      # LOGIN_DELAY_BASE_MS: 600     # 失败后递增延迟起点
+      # LOGIN_DELAY_MAX_MS: 4000     # 递增延迟上限
+      # SESSION_TTL_MS: 604800000    # 登录有效期（7 天）
+      # TRUST_PROXY: "false"         # 放在反向代理后面才设为 true（按 X-Forwarded-For 计数）
+
+    volumes:
+      # 要处理的目录都挂到 /data 下面，
+      # 应用里从 /data 逐级往下浏览即可，不需要配置 ROOTS
+      - ./data:/data
+      # 预设 / 历史 / 设置 / 账号，务必持久化，否则重建容器会丢
+      - ./renamer-config:/config
+
+      # ─── 多个宿主目录？全部挂进 /data 下即可（不用改任何环境变量）───
+      # 若想让顶栏直接列出多个根目录，再设置上面的 ROOTS 即可
+      # volumes:
+      #   - /volume1/photos:/data/photos
+      #   - /volume2/downloads:/data/downloads
+      #   - ./music:/data/music
+      #   - ./renamer-config:/config
+
+    restart: unless-stopped

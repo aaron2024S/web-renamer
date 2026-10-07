@@ -1,0 +1,26 @@
+{
+  "name": "web-renamer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "自托管 Docker 版文件批量重命名工具（ReNamer 替代）",
+  "type": "module",
+  "workspaces": [
+    "server",
+    "web"
+  ],
+  "scripts": {
+    "dev": "concurrently -n server,web -c blue,magenta \"npm:dev:server\" \"npm:dev:web\"",
+    "dev:server": "npm -w server run dev",
+    "dev:web": "npm -w web run dev",
+    "build": "npm -w web run build && npm -w server run build",
+    "start": "npm -w server run start",
+    "smoke": "npm -w server run smoke",
+    "test": "npm -w server run smoke"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
