@@ -56,7 +56,7 @@ startWatcher(getSettings().watch, config.roots);
 
 try {
   await app.listen({ port: config.port, host: config.host });
-  app.log.info(`ReNamer Web 已启动 → http://localhost:${config.port}`);
+  app.log.info(`Web ReNamer 已启动 → http://localhost:${config.port}`);
   app.log.info(`可操作根目录: ${config.roots.join(', ')}`);
 } catch (err) {
   app.log.error(err);

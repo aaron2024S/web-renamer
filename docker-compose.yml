@@ -1,8 +1,8 @@
 services:
   renamer:
     build: .
-    image: aaron2024s/renamer-web:latest
-    container_name: renamer-web
+    image: aaron2024s/web-renamer:latest
+    container_name: web-renamer
     ports:
       # 左边是宿主机端口，右边是容器内端口（与 PORT 保持一致）
       - "7582:7582"

@@ -1,4 +1,4 @@
-# ReNamer Web
+# Web ReNamer
 
 自托管的**批量文件重命名工具**（Docker / Web 版），功能对标 [ReNamer](https://renamer.com.cn/)，但没有免费版的限制：**规则数量与预设数量都不设上限**。
 
@@ -47,18 +47,18 @@ docker compose up -d --build
 ### 只用 docker run
 
 ```bash
-docker build -t renamer-web .
-docker run -d --name renamer-web \
+docker build -t web-renamer .
+docker run -d --name web-renamer \
   -p 7582:7582 \
   -e PUID=1000 -e PGID=1000 \
   -v /你的/待处理目录:/data \
   -v $(pwd)/renamer-config:/config \
-  renamer-web
+  web-renamer
 ```
 
 ### 用 GitHub Actions 构建并推送镜像（手动触发）
 
-仓库里带了一个**手动触发**的构建流程：`.github/workflows/docker-publish.yml`，会把镜像推到 Docker Hub 的 `<DOCKERHUB_USERNAME>/renamer-web`。
+仓库里带了一个**手动触发**的构建流程：`.github/workflows/docker-publish.yml`，会把镜像推到 Docker Hub 的 `<DOCKERHUB_USERNAME>/web-renamer`。
 
 **第一次使用前**，先去仓库 `Settings → Secrets and variables → Actions` 添加两个密钥：
 
@@ -77,7 +77,7 @@ docker run -d --name renamer-web \
 构建完成后，如果不想在本地构建，把 `docker-compose.yml` 里的 `build: .` 一行删掉，只留 `image`：
 
 ```yaml
-image: aaron2024s/renamer-web:latest
+image: aaron2024s/web-renamer:latest
 ```
 
 再 `docker compose pull && docker compose up -d` 即可。（保留 `build: .` 则 `up --build` 会在本地构建并以该名字打标签。）

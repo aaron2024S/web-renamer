@@ -50,7 +50,7 @@ export function LoginScreen() {
             <Lock size={20} color="#fff" />
           </div>
           <div className="leading-tight">
-            <div className="text-[19px] font-semibold tracking-tight">ReNamer Web</div>
+            <div className="text-[19px] font-semibold tracking-tight">Web ReNamer</div>
             <div className="muted text-[12px]">自托管 · 批量重命名</div>
           </div>
         </div>

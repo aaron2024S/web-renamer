@@ -35,7 +35,7 @@ export function TopBar() {
           <Wand2 size={18} color="#fff" />
         </div>
         <div className="leading-tight">
-          <div className="text-[15px] font-semibold tracking-tight">ReNamer Web</div>
+          <div className="text-[15px] font-semibold tracking-tight">Web ReNamer</div>
           <div className="muted hidden text-[11px] sm:block">自托管 · 无限规则与预设</div>
         </div>
       </div>
