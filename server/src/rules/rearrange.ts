@@ -42,17 +42,22 @@ export function applyRearrange(s: string, params: any): string {
 
   const refs = [...pattern.matchAll(/\$(\d+)/g)]
     .map((m) => Number(m[1]))
-    .filter((n) => n > 0);
+    .filter((n) => n !== 0);
   // 片段不够时直接保留原名，避免拼出 ' 名字' 这种带悬空分隔符的坏名字
-  if (params.keepIfShort !== false && refs.some((n) => n > parts.length)) return s;
+  if (
+    params.keepIfShort !== false &&
+    refs.some((n) => (n > 0 ? n > parts.length : -n > parts.length))
+  )
+    return s;
 
   const appendRest = params.appendRest !== false;
   const used = new Set<number>();
 
-  const out = pattern.replace(/\$(\d+)/g, (_m, raw: string) => {
+  // 对齐 ReNamer：$1..$N 从前往后，$-1..$-N 从末尾往前，$0 = 原始整名
+  const out = pattern.replace(/\$(-?\d+)/g, (_m, raw: string) => {
     const n = Number(raw);
     if (n === 0) return s; // $0 = 原始整名
-    const part = parts[n - 1];
+    const part = n > 0 ? parts[n - 1] : parts[parts.length + n];
     if (part === undefined) return '';
     used.add(n);
     return part;
@@ -60,7 +65,9 @@ export function applyRearrange(s: string, params: any): string {
 
   if (!appendRest) return out;
 
-  const rest = parts.filter((_, i) => !used.has(i + 1));
+  const rest = parts.filter(
+    (_, i) => !used.has(i + 1) && !used.has(-(parts.length - i)),
+  );
   if (rest.length === 0) return out;
   return [out, ...rest].filter((x) => x !== '').join(join);
 }

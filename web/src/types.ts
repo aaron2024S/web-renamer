@@ -14,7 +14,8 @@ export type RuleType =
   | 'pinyin'
   | 'date'
   | 'meta'
-  | 'script';
+  | 'script'
+  | 'userinput';
 
 export type Scope = 'name' | 'ext' | 'full';
 

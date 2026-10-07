@@ -3,12 +3,16 @@ import { Field, Toggle } from './ui';
 
 function fieldVisible(type: string, key: string, params: Record<string, any>): boolean {
   if (type === 'remove') {
+    if (key === 'text' || key === 'occurrences' || key === 'caseSensitive' || key === 'wholeWord')
+      return params.mode === 'text';
     if (key === 'chars') return params.mode === 'chars';
     if (key === 'from' || key === 'count' || key === 'fromEnd') return params.mode === 'range';
     if (key === 'open' || key === 'close' || key === 'inclusive') return params.mode === 'between';
   }
-  if (type === 'extension' && key === 'value') return params.mode === 'set';
+  if (type === 'extension' && key === 'value') return params.mode === 'set' || params.mode === 'append';
   if (type === 'insert' && key === 'at') return params.position === 'index';
+  if (type === 'insert' && key === 'anchor')
+    return params.position === 'afterText' || params.position === 'beforeText';
   if (type === 'replace' && key === 'wholeWord') return !params.regex;
   if (type === 'rearrange') {
     if (key === 'pattern' || key === 'appendRest' || key === 'keepIfShort') return params.mode === 'template';
@@ -16,6 +20,8 @@ function fieldVisible(type: string, key: string, params: Record<string, any>): b
   }
   if (type === 'pinyin' && key === 'separator') return params.mode === 'full';
   if (type === 'date' && key === 'join') return params.mode === 'prefix' || params.mode === 'suffix';
+  if (type === 'strip' && key === 'where') return !!params.removeChars;
+  if (type === 'serialize' && key === 'at') return params.mode === 'index';
   return true;
 }
 

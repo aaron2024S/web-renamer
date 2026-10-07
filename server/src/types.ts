@@ -18,7 +18,8 @@ export type RuleType =
   | 'pinyin' // 中文转拼音
   | 'date' // 日期重格式化
   | 'meta' // 元标签（音乐 / 图片）
-  | 'script'; // JavaScript 脚本
+  | 'script' // JavaScript 脚本
+  | 'userinput'; // 用户输入（每行一个名字）
 
 /** 规则作用对象：主名 / 扩展名 / 整个文件名 */
 export type Scope = 'name' | 'ext' | 'full';

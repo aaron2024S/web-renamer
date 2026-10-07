@@ -216,6 +216,92 @@ async function main() {
     ok('20241007 → 2024-10-07；中文日期 → 2024-10-07；日期移到开头');
   }
 
+  /* ---------- 11. 对齐 ReNamer 补齐的选项 ---------- */
+  console.log('11) ReNamer 对齐（remove-last / replace-last / 负引用 / 编号系统 / 用户输入等）');
+  {
+    const { dir, roots } = await newWorkspace();
+
+    // remove：指定文本，仅最后一个（用户举例的 ReNamer「Last」）
+    const f1 = touch(dir, 'track 01 - remix 01.mp3');
+    const p1 = await buildPlan(f1, [rule('remove', { mode: 'text', text: '01', occurrences: 'last' })], roots);
+    assert.strictEqual(p1.items[0].dstName, 'track 01 - remix .mp3');
+    // remove：仅第一个 + 不区分大小写 + 全词
+    const f1b = touch(dir, 'Abc abc ABC.txt');
+    const p1b = await buildPlan(f1b, [rule('remove', { mode: 'text', text: 'abc', occurrences: 'first', caseSensitive: false })], roots);
+    assert.strictEqual(p1b.items[0].dstName, ' abc ABC.txt');
+    const f1c = touch(dir, 'catch cat.txt');
+    const p1c = await buildPlan(f1c, [rule('remove', { mode: 'text', text: 'cat', occurrences: 'all', wholeWord: true })], roots);
+    assert.strictEqual(p1c.items[0].dstName, 'catch .txt');
+    const p1d = await buildPlan(f1c, [rule('remove', { mode: 'text', text: 'cat', occurrences: 'all', wholeWord: false })], roots);
+    assert.strictEqual(p1d.items[0].dstName, 'ch .txt');
+
+    // replace：仅最后一个
+    const f2 = touch(dir, 'a-b-b.txt');
+    const p2 = await buildPlan(f2, [rule('replace', { find: '-', replaceWith: '+', occurrences: 'last' })], roots);
+    assert.strictEqual(p2.items[0].dstName, 'a-b+b.txt');
+
+    // insert：在文本之后 / 之前 / 替换主名
+    const f3 = touch(dir, '第01集.mkv');
+    const p3 = await buildPlan(f3, [rule('insert', { position: 'afterText', text: '_NH', anchor: '第01集' })], roots);
+    assert.strictEqual(p3.items[0].dstName, '第01集_NH.mkv');
+    const f3b = touch(dir, 'report.docx');
+    const p3b = await buildPlan(f3b, [rule('insert', { position: 'beforeText', text: '2024-', anchor: 'report' })], roots);
+    assert.strictEqual(p3b.items[0].dstName, '2024-report.docx');
+    const p3c = await buildPlan(f3b, [rule('insert', { position: 'replace', text: '结论' })], roots);
+    assert.strictEqual(p3c.items[0].dstName, '结论.docx');
+
+    // rearrange：负引用 $-1
+    const f4 = touch(dir, 'A B C.txt');
+    const p4 = await buildPlan(f4, [rule('rearrange', { mode: 'template', delimiter: ' ', pattern: '$-1 $1' })], roots);
+    assert.strictEqual(p4.items[0].dstName, 'C A B.txt');
+
+    // serialize：重复 + 字母 / 罗马数字
+    const f5 = touch(dir, 'a.txt', 'b.txt', 'c.txt', 'd.txt');
+    const p5 = await buildPlan(f5, [rule('serialize', { mode: 'prefix', start: 1, step: 1, repeat: 2, system: 'letters' })], roots);
+    const names5 = p5.items.map((i) => i.dstName).sort();
+    assert.deepStrictEqual(names5, ['aa.txt', 'ab.txt', 'bc.txt', 'bd.txt']);
+    const p5b = await buildPlan(f5, [rule('serialize', { mode: 'suffix', start: 1, step: 1, system: 'roman' })], roots);
+    const names5b = p5b.items.map((i) => i.dstName).sort();
+    assert.deepStrictEqual(names5b, ['aI.txt', 'bII.txt', 'cIII.txt', 'dIV.txt']);
+
+    // extension：追加
+    const p6 = await buildPlan(f3b, [rule('extension', { mode: 'append', value: 'bak' })], roots);
+    assert.strictEqual(p6.items[0].dstName, 'report.docx.bak');
+
+    // strip：仅删开头的字符
+    const f7 = touch(dir, '__hello__.txt');
+    const p7 = await buildPlan(f7, [rule('strip', { trim: false, collapseSpaces: false, removeChars: '_', where: 'leading' })], roots);
+    assert.strictEqual(p7.items[0].dstName, 'hello__.txt');
+
+    // cleanup：括号内容 + 驼峰加空格
+    const f8 = touch(dir, 'video (1080p) [x264] CamelCase.txt');
+    const p8 = await buildPlan(f8, [rule('cleanup', { replaceWith: '_', collapse: false, trimEnds: false, stripBrackets: true, camelSpace: true })], roots);
+    assert.strictEqual(p8.items[0].dstName, 'video   Camel Case.txt');
+
+    // padding：去前导零
+    const f9 = touch(dir, '007.txt');
+    const p9 = await buildPlan(f9, [rule('padding', { length: 0, char: '0', align: 'left', stripZeros: true })], roots);
+    assert.strictEqual(p9.items[0].dstName, '7.txt');
+
+    // case：首字母大写（保留其余）
+    const f10 = touch(dir, 'hello WORLD foo.txt');
+    const p10 = await buildPlan(f10, [rule('case', { mode: 'capitalize' })], roots);
+    assert.strictEqual(p10.items[0].dstName, 'Hello WORLD Foo.txt');
+
+    // userinput：按行替换
+    const f11 = touch(dir, 'IMG_0001.jpg', 'IMG_0002.jpg');
+    const p11 = await buildPlan(f11, [rule('userinput', { mode: 'replace', lines: '日落\n日出' })], roots);
+    const names11 = p11.items.map((i) => i.dstName).sort();
+    assert.deepStrictEqual(names11, ['日出.jpg', '日落.jpg']);
+
+    // remove：区间删到末尾（长度留空）
+    const f12 = touch(dir, 'name_suffix.txt');
+    const p12 = await buildPlan(f12, [rule('remove', { mode: 'range', from: 5, count: 0 })], roots);
+    assert.strictEqual(p12.items[0].dstName, 'name.txt');
+
+    ok('remove/last、replace/last、insert 锚点、$-1、letters/roman 编号、追加扩展名、strip 位置、括号清理、去零、用户输入、区间删到末尾');
+  }
+
   console.log(`\n全部通过：${passed} 项\n`);
 }
 
