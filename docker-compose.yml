@@ -1,7 +1,7 @@
 services:
   renamer:
     build: .
-    image: renamer-web:latest
+    image: aaron2024s/renamer-web:latest
     container_name: renamer-web
     ports:
       # 左边是宿主机端口，右边是容器内端口（与 PORT 保持一致）
@@ -42,12 +42,10 @@ services:
       # 预设 / 历史 / 设置 / 账号，务必持久化，否则重建容器会丢
       - ./renamer-config:/config
 
-      # ─── 多个宿主目录？全部挂进 /data 下即可（不用改任何环境变量）───
-      # 若想让顶栏直接列出多个根目录，再设置上面的 ROOTS 即可
-      # volumes:
-      #   - /volume1/photos:/data/photos
-      #   - /volume2/downloads:/data/downloads
-      #   - ./music:/data/music
-      #   - ./renamer-config:/config
+      # ─── 多个宿主目录？在上面这个列表里继续加即可（不用改任何环境变量）───
+      # 若想让顶栏直接列出多个根目录，再设置上面的 ROOTS
+      # - /volume1/photos:/data/photos
+      # - /volume2/downloads:/data/downloads
+      # - ./music:/data/music
 
     restart: unless-stopped

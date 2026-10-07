@@ -58,7 +58,7 @@ docker run -d --name renamer-web \
 
 ### 用 GitHub Actions 构建并推送镜像（手动触发）
 
-仓库里带了一个**手动触发**的构建流程：`.github/workflows/docker-publish.yml`，会把镜像推到 Docker Hub 的 `<DOCKERHUB_USERNAME>/web-renamer`。
+仓库里带了一个**手动触发**的构建流程：`.github/workflows/docker-publish.yml`，会把镜像推到 Docker Hub 的 `<DOCKERHUB_USERNAME>/renamer-web`。
 
 **第一次使用前**，先去仓库 `Settings → Secrets and variables → Actions` 添加两个密钥：
 
@@ -74,13 +74,13 @@ docker run -d --name renamer-web \
 - **push**：取消勾选则只构建不推送 —— 用来验证 Dockerfile 能否编过
 - **no_cache**：勾上则忽略构建缓存
 
-构建完成后，把 `docker-compose.yml` 里的 `build: .` 换成预构建镜像：
+构建完成后，如果不想在本地构建，把 `docker-compose.yml` 里的 `build: .` 一行删掉，只留 `image`：
 
 ```yaml
-image: <你的Docker Hub用户名>/web-renamer:latest
+image: aaron2024s/renamer-web:latest
 ```
 
-再 `docker compose pull && docker compose up -d` 即可，无需在本地构建。
+再 `docker compose pull && docker compose up -d` 即可。（保留 `build: .` 则 `up --build` 会在本地构建并以该名字打标签。）
 
 ### 群晖 / 威联通等 NAS 面板
 
